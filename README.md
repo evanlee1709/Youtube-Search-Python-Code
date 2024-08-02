@@ -1,4 +1,4 @@
-# YouTube Video and Comment Analyzer
+# YouTube Search Comment and Transcript Analyzer
 
 This project allows you to analyze YouTube videos to gather public opinions and potential biases on various topics. The tool fetches video details, transcripts, and comments, providing summaries and organized data to help you understand public sentiments.
 
