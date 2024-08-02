@@ -1,51 +1,64 @@
-```markdown
-# YouTube Video Analysis for Restaurant Robots
+# YouTube Video and Comment Analyzer
 
-This project aims to gather and analyze transcripts and comments from YouTube videos related to the use of robots in restaurants. The goal is to understand public opinions and potential prejudices about digitalizing dining experiences in America compared to Asia.
+This project allows you to analyze YouTube videos to gather public opinions and potential biases on various topics. The tool fetches video details, transcripts, and comments, providing summaries and organized data to help you understand public sentiments.
 
-## Table of Contents
+## Overview
 
-- [Introduction](#introduction)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
+This tool uses the YouTube Data API, YouTube Transcript API, and an LLM (Large Language Model) to:
+- Search for YouTube videos based on a query.
+- Fetch video details, transcripts, and comments.
+- Organize and summarize transcripts and comments.
+- Save the results to an Excel file for further analysis.
 
-## Introduction
+You can customize the number of videos to analyze, include/exclude videos without transcripts, and handle duplicate videos.
 
-This project was created to search YouTube for videos on a specific topic, gather either the transcripts or comments of a certain number of videos, and analyze them to understand public sentiment. The focus was on researching how people feel about robots being used in restaurants, comparing the opinions in America to those in Asia.
+## Getting Started
 
-## Features
+### Prerequisites
 
-- Search YouTube for videos on a specific topic
-- Retrieve video details such as title, description, publish date, and views
-- Fetch transcripts of videos and organize them with proper punctuation and capitalization
-- Summarize video transcripts
-- Download and summarize comments from YouTube videos
-- Save data to Excel for further analysis
+- Python 3.7 or higher
+- YouTube Data API Key
+- Required Python packages: `os`, `logging`, `scrapetube`, `googleapiclient`, `openpyxl`, `langchain_community`, `youtube_transcript_api`, `youtube_comment_downloader`
 
-## Installation
+### Installation
 
-To run this project, you need to have Python installed along with several libraries. Follow these steps to set up the environment:
+1. Clone this repository:
+   ```sh
+   git clone https://github.com/yourusername/YouTube-Video-Comment-Analyzer.git
+   cd YouTube-Video-Comment-Analyzer
+   ```
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/your-repository.git
+2. Install the required Python packages:
+   ```sh
+   pip install -r requirements.txt
+   ```
 
-# Navigate to the project directory
-cd your-repository
+3. Set your YouTube Data API key:
+   ```python
+   API_KEY = 'YOUR_API_KEY'
+   ```
 
-# Install dependencies
-pip install -r requirements.txt
-```
+### Running the Code
 
-## Usage
+1. Open the `analyze_transcripts.py` file and `analyze_comments.py` file.
+2. Update the `API_KEY` variable with your YouTube Data API key.
+3. Run the script:
+   ```sh
+   python analyze_transcripts.py
+   ```
+   or
+   ```sh
+   python analyze_comments.py
+   ```
+4. Follow the prompts to input your search query, number of videos, and other options.
+
+## Demo
+
+Check out this [tutorial walkthrough video](https://youtu.be/your-demo-video-url) to see how to run the code and what the final output looks like.
+
+## Code
 
 ### Transcript Analysis
-
-This script fetches transcripts of YouTube videos and saves them along with video details to an Excel file.
 
 ```python
 import os
@@ -65,9 +78,7 @@ llm = Ollama(base_url="http://131.123.41.132:11434", model="llava:34b")
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
 def get_video_details(video_id):
-    """Fetch video details such as title, description, and publish date using the YouTube Data API."""
     try:
         request = youtube.videos().list(part="snippet, statistics", id=video_id)
         response = request.execute()
@@ -86,7 +97,6 @@ def get_video_details(video_id):
         logging.error(f"Error fetching details for video {video_id}: {e}")
     return '', '', '', ''
 
-
 def get_transcript(video_id):
     try:
         data = yta.get_transcript(video_id)
@@ -95,7 +105,6 @@ def get_transcript(video_id):
     except Exception as e:
         logging.error(f"Error fetching transcript for video {video_id}: {e}")
         return ''
-
 
 def organize_transcript(transcript):
     if not transcript:
@@ -118,7 +127,6 @@ def summarize_transcript(transcript):
     return summary_text
 
 def save_to_excel(data, filename='AI DataLog_Transcript_Record.xlsx'):
-    """Save data to an Excel file."""
     try:
         if os.path.exists(filename):
             wb = load_workbook(filename)
@@ -136,10 +144,8 @@ def save_to_excel(data, filename='AI DataLog_Transcript_Record.xlsx'):
     except Exception as e:
         logging.error(f"Error saving data to Excel: {e}")
 
-
 def track_progress(current, total):
     logging.info(f"Processed {current}/{total} videos. {total - current} videos left.")
-
 
 def remove_duplicates(videos):
     seen = set()
@@ -150,7 +156,6 @@ def remove_duplicates(videos):
             seen.add(video_id)
             unique_videos.append(video)
     return unique_videos
-
 
 def main():
     search_query = input("YouTube Search: ")
@@ -174,7 +179,6 @@ def main():
         edited_transcript = organize_transcript(transcript) if transcript else "Transcript not available"
         summary = summarize_transcript(transcript) if transcript else "Summary not available"
 
-        # Print details in the specified order
         print("\nURL:", video_url)
         print("Title:", title)
         print("Publish Date:", publish_date)
@@ -186,7 +190,6 @@ def main():
         data = [title, video_id, video_url, description, publish_date, views, edited_transcript, summary]
         all_data.append(data)
 
-        # Track progress
         track_progress(i + 1, len(unique_videos))
 
         if i >= total_videos - 1:
@@ -194,14 +197,11 @@ def main():
 
     save_to_excel(all_data)
 
-
 if __name__ == "__main__":
     main()
 ```
 
-### Comments Analysis
-
-This script downloads comments from YouTube videos and summarizes them, saving the data to an Excel file.
+### Comment Analysis
 
 ```python
 import re
@@ -213,16 +213,12 @@ from googleapiclient.errors import HttpError
 from openpyxl import Workbook
 from langchain_community.llms import Ollama
 
-# Initialize the YouTube Data API client
 API_KEY = 'YOUR_API_KEY'
 youtube = build('youtube', 'v3', developerKey=API_KEY)
 
-# Initialize the Ollama LLM instance
 llm = Ollama(base_url="http://131.123.41.132:11434", model="llava:34b")
 
-# Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 
 def get_video_details(video_id):
     try:
@@ -243,7 +239,6 @@ def get_video_details(video_id):
         logging.error(f"Error fetching details for video {video_id}: {e}")
     return '', '', '', ''
 
-
 def get_all_comments(video_id):
     try:
         downloader = YoutubeCommentDownloader()
@@ -255,20 +250,19 @@ def get_all_comments(video_id):
         logging.error(f"Error downloading comments for video {video_id}: {e}")
         return []
 
-
 def summarize_comments(comments):
     if not comments:
         return "Transcript does not exist"
 
-    # Join all comments into a single text block
     comments_text = "\n".join(comments)
-
-    # Break comments into chunks if they are too long
-    max_chunk_size = 2000  # Define a reasonable chunk size
+    max_chunk_size = 2000
     comment_chunks = [comments_text[i:i + max_chunk_size] for i in range(0, len(comments_text), max_chunk_size)]
 
     chunk_summaries = []
 
     try:
         for chunk in comment_chunks:
-            response = llm.invoke(f"Please summarize the following
+            response = llm.invoke(f"Please summarize the following comments: {chunk}")
+            chunk_summaries.append(response)
+        return " ".join(chunk_summaries)
+    except Exception as e:
