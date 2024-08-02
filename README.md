@@ -54,7 +54,7 @@ You can customize the number of videos to analyze, include/exclude videos withou
 
 ## Demo
 
-Check out this [tutorial walkthrough video](https://youtu.be/your-demo-video-url) to see how to run the code and what the final output looks like.
+Check out this [tutorial walkthrough video]([https://youtu.be/your-demo-video-url](https://youtu.be/_XrP-Ch8D-s)) to see how to run the code and what the final output looks like.
 
 ## Code
 
